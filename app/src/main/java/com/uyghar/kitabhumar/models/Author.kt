@@ -1,4 +1,9 @@
 package com.uyghar.kitabhumar.models
 
-class Author {
-}
+data class Author(
+    val id: Int?,
+    val name: String?,
+    val image: String?,
+    val surname: String?,
+    val gender: String?,
+)
