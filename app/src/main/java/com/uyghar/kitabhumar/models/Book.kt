@@ -7,5 +7,5 @@ data class Book(
     val favorite: String?,
     val cat: Int?,
     val ret: Int?,
-    val author: Int?
+    val author: Author?
 )

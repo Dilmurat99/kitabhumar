@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import com.uyghar.kitabhumar.models.Author
 import com.uyghar.kitabhumar.models.Book
+import com.uyghar.kitabhumar.models.Post
 import com.uyghar.kitabhumar.models.Slider
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -42,7 +43,9 @@ class HomeFragment : Fragment() {
     private var slider_array: Array<Slider>? = null
     private var book_array: Array<Book>? = null
     private var author_array: Array<Author>? = null
+    private var post_array: Array<Post>? = null
     private var no = 0;
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -62,11 +65,12 @@ class HomeFragment : Fragment() {
             val isBooksReady = async { getBooks() }
             val isAuthorsReady = async { getAuthors() }
             val isSliderReady = async { getSlider() }
-            if (isBooksReady.await() && isAuthorsReady.await() && isSliderReady.await()) {
+            val isPostsReady = async { getPosts() }
+            if (isBooksReady.await() && isAuthorsReady.await() && isSliderReady.await() && isPostsReady.await()) {
                 activity?.runOnUiThread {
                     binding.progressView.visibility = View.INVISIBLE
                     binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-                    binding.recyclerView.adapter = PostAdapter(requireContext())
+                    binding.recyclerView.adapter = PostAdapter(requireContext(), post_array!!)
                 }
             }
             /*getBooks()
@@ -172,6 +176,29 @@ class HomeFragment : Fragment() {
                     activity?.runOnUiThread {
                         showAuthor()
                     }
+                    res.resume(true)
+                }
+
+            }
+        )
+    }
+
+    suspend fun getPosts(): Boolean = suspendCoroutine { res ->
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(URL("http://172.104.143.75:8004/api/posts/"))
+            .build()
+        client.newCall(request).enqueue(
+            object: Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    res.resume(false)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val json_str = response.body?.string()
+                    val gson = GsonBuilder().create()
+                    post_array = gson.fromJson(json_str, Array<Post>::class.java)
                     res.resume(true)
                 }
 
