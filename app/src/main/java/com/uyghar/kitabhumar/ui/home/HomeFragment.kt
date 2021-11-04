@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.shape.CornerSize
 import com.google.android.material.tabs.TabLayoutMediator
 import com.uyghar.kitabhumar.R
@@ -61,8 +62,13 @@ class HomeFragment : Fragment() {
             val isBooksReady = async { getBooks() }
             val isAuthorsReady = async { getAuthors() }
             val isSliderReady = async { getSlider() }
-            if (isBooksReady.await() && isAuthorsReady.await() && isSliderReady.await())
-                binding.progressView.visibility = View.INVISIBLE
+            if (isBooksReady.await() && isAuthorsReady.await() && isSliderReady.await()) {
+                activity?.runOnUiThread {
+                    binding.progressView.visibility = View.INVISIBLE
+                    binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+                    binding.recyclerView.adapter = PostAdapter(requireContext())
+                }
+            }
             /*getBooks()
         getAuthors()
         getSlider()*/
