@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.shape.CornerSize
 import com.google.android.material.tabs.TabLayoutMediator
@@ -48,7 +49,7 @@ class HomeFragment : Fragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentHomeBinding
 
 
     override fun onCreateView(
@@ -60,6 +61,7 @@ class HomeFragment : Fragment() {
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding  = _binding!!
         val root: View = binding.root
         GlobalScope.launch {
             val isBooksReady = async { getBooks() }
@@ -70,7 +72,7 @@ class HomeFragment : Fragment() {
                 activity?.runOnUiThread {
                     binding.progressView.visibility = View.INVISIBLE
                     binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-                    binding.recyclerView.adapter = PostAdapter(requireContext(), post_array!!)
+                    binding.recyclerView.adapter = PostAdapter(requireContext(),this@HomeFragment, post_array!!)
                 }
             }
             /*getBooks()

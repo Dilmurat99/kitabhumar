@@ -5,28 +5,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.uyghar.kitabhumar.R
+import com.squareup.picasso.Picasso
+import com.uyghar.kitabhumar.databinding.FragmentDetailBinding
+import com.uyghar.kitabhumar.models.Post
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private var _binding: FragmentDetailBinding? = null
+    private val binding get() = _binding!!
+    private var post: Post? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+           post = it.getParcelable("post")
         }
     }
 
@@ -35,26 +28,21 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false)
+        _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
+        return root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Picasso.get().load(post?.user?.image).into(binding.userImage)
+        Picasso.get().load(post?.book?.image).into(binding.bookImage)
+        binding.bookText.setText(post?.book?.title + "\n" + post?.book?.author?.name + " " + post?.book?.author?.surname)
+        binding.postDate.setText(post?.updated_at)
+        binding.userName.setText(post?.user?.nickname + " " + post?.post_category?.title)
+        binding.postText.setText(post?.content)
+
     }
+
 }

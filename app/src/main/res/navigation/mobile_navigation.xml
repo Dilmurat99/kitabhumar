@@ -22,4 +22,8 @@
         android:name="com.uyghar.kitabhumar.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.uyghar.kitabhumar.ui.detail.DetailFragment"
+        android:label="DetailFragment" />
 </navigation>
