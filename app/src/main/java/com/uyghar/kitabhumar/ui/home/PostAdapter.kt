@@ -18,10 +18,6 @@ class PostAdapter(val context: Context, val post_array: Array<Post>): RecyclerVi
 
     override fun onBindViewHolder(holder: PostHolder, position: Int) {
         val post = post_array.get(position)
-//        val user_image_id = context.resources.getIdentifier(post.user_image,"drawable",context.packageName)
-//        val book_image_id = context.resources.getIdentifier(post.book_image,"drawable",context.packageName)
-//        holder.postItemBinding.userImage.setImageResource(user_image_id)
-//        holder.postItemBinding.bookImage.setImageResource(book_image_id)
         Picasso.get().load(post.user?.image).into(holder.postItemBinding.userImage)
         Picasso.get().load(post.book?.image).into(holder.postItemBinding.bookImage)
         holder.postItemBinding.bookText.setText(post.book?.title + "\n" + post.book?.author?.name + " " + post.book?.author?.surname)

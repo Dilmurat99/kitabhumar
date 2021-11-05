@@ -1,5 +1,6 @@
 package com.uyghar.kitabhumar
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
@@ -12,6 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.uyghar.kitabhumar.databinding.ActivityMainBinding
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,6 +45,19 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase?.changeLocale("ug"))
+    }
+
+    fun Context.changeLocale(language: String): Context {
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = this.resources.configuration
+        config.setLocale(locale)
+        return createConfigurationContext(config)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
