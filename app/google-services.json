@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "852531578982",
+    "project_id": "kitabhumar-60d1b",
+    "storage_bucket": "kitabhumar-60d1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852531578982:android:46cc42d90a2864688145a7",
+        "android_client_info": {
+          "package_name": "com.uyghar.kitabhumar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "852531578982-1uuvtcjmkv5oepdkfqk1ugvsnlss6si5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3awaNQM-ATgZZQoPFRXUg46XVDQsdDDA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "852531578982-1uuvtcjmkv5oepdkfqk1ugvsnlss6si5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

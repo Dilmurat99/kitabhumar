@@ -26,4 +26,14 @@
         android:id="@+id/detailFragment"
         android:name="com.uyghar.kitabhumar.ui.detail.DetailFragment"
         android:label="DetailFragment" />
+    <fragment
+        android:id="@+id/userFragment"
+        android:name="com.uyghar.kitabhumar.ui.user.UserFragment"
+        android:label="fragment_user"
+        tools:layout="@layout/fragment_user" />
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.uyghar.kitabhumar.ui.user.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" />
 </navigation>
