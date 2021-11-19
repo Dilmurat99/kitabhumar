@@ -40,7 +40,15 @@ class UserFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_user, container, false)
         val buttonReg = root.findViewById<Button>(R.id.button_register)
         buttonReg.setOnClickListener {
-            findNavController().navigate(R.id.registerFragment)
+            val bundle = Bundle()
+            bundle.putBoolean("is_login",false)
+            findNavController().navigate(R.id.registerFragment,bundle)
+        }
+        val buttonLogin = root.findViewById<Button>(R.id.button_login)
+        buttonLogin.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putBoolean("is_login",true)
+            findNavController().navigate(R.id.registerFragment,bundle)
         }
         return root
     }

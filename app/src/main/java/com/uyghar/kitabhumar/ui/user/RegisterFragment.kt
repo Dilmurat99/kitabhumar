@@ -9,9 +9,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import android.widget.Toast
+
+import androidx.annotation.NonNull
+
+import com.google.android.gms.tasks.OnCompleteListener
 import com.uyghar.kitabhumar.R
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -29,12 +36,16 @@ class RegisterFragment : Fragment() {
     private var param2: String? = null
 
     private lateinit var auth: FirebaseAuth
+    var is_login = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+        }
+        arguments?.let {
+            is_login = it.getBoolean("is_login")
         }
         auth = Firebase.auth
     }
@@ -49,20 +60,37 @@ class RegisterFragment : Fragment() {
         val editEmail = root.findViewById<EditText>(R.id.editEmail)
         val editPassword = root.findViewById<EditText>(R.id.editPassword)
         buttonReg.setOnClickListener {
-
-            auth.createUserWithEmailAndPassword(editEmail.text.toString(), editPassword.text.toString())
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("regUser", "createUserWithEmail:success")
-                        val user = auth.currentUser
-
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("regUser", "createUserWithEmail:failure", task.exception)
-
+            if (is_login) {
+                auth.signInWithEmailAndPassword(editEmail.text.toString(),
+                    editPassword.text.toString())
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Log.i("regUser", "Login")
+                        }
                     }
-                }
+                    .addOnFailureListener {
+                        Log.i("regUser", it.toString())
+                    }
+            } else {
+                auth.createUserWithEmailAndPassword(
+                    editEmail.text.toString(),
+                    editPassword.text.toString()
+                )
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val user = auth.currentUser
+                            user?.sendEmailVerification()
+                                ?.addOnCompleteListener {
+                                    Log.i("regUser", "Email was sent")
+                                }
+
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.i("regUser", "createUserWithEmail:failure", task.exception)
+
+                        }
+                    }
+            }
         }
         return root
     }
