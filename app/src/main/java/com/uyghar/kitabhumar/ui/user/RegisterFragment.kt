@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
@@ -18,12 +19,18 @@ import androidx.annotation.NonNull
 
 import com.google.android.gms.tasks.OnCompleteListener
 import com.uyghar.kitabhumar.R
+import androidx.core.app.ActivityCompat.startActivityForResult
+
+import android.content.Intent
+import android.content.DialogInterface
+import androidx.appcompat.app.AlertDialog
 
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+
 
 /**
  * A simple [Fragment] subclass.
@@ -34,6 +41,8 @@ class RegisterFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    var from = 0 //This must be declared as global !
 
     private lateinit var auth: FirebaseAuth
     var is_login = true
@@ -59,6 +68,35 @@ class RegisterFragment : Fragment() {
         val buttonReg = root.findViewById<Button>(R.id.buttonReg)
         val editEmail = root.findViewById<EditText>(R.id.editEmail)
         val editPassword = root.findViewById<EditText>(R.id.editPassword)
+        val buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
+        buttonImage.setOnClickListener {
+            val choice = arrayOf("Choose from Gallery", "Capture a photo")
+
+            val alert: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(activity)
+            alert.setTitle("Upload Photo")
+            alert.setSingleChoiceItems(choice, -1,
+                DialogInterface.OnClickListener { dialog, which ->
+                    if (choice[which] === "Choose from Gallery") {
+                        from = 1
+                    } else if (choice[which] === "Capture a photo") {
+                        from = 2
+                    }
+                })
+            alert.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
+                if (from == 0) {
+                    Toast.makeText(
+                        activity, "Select One Choice",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (from == 1) {
+                    // Your Code
+                } else if (from == 2) {
+                    // Your Code
+                }
+            })
+            alert.show()
+
+        }
         buttonReg.setOnClickListener {
             if (is_login) {
                 auth.signInWithEmailAndPassword(editEmail.text.toString(),
@@ -67,10 +105,15 @@ class RegisterFragment : Fragment() {
                         if (it.isSuccessful) {
                             Log.i("regUser", "Login")
                         }
+                        else {
+                            Log.i("regUser", it.exception?.localizedMessage.toString())
+                        }
                     }
-                    .addOnFailureListener {
-                        Log.i("regUser", it.toString())
-                    }
+                    /*.addOnFailureListener {
+                        //Log.i("regUser", it.toString())
+
+                        Log.i("regUser", it.getLocalizedMessage())
+                    }*/
             } else {
                 auth.createUserWithEmailAndPassword(
                     editEmail.text.toString(),
@@ -86,7 +129,7 @@ class RegisterFragment : Fragment() {
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.i("regUser", "createUserWithEmail:failure", task.exception)
+                            Log.i("regUser", task.exception?.localizedMessage ?: "")
 
                         }
                     }

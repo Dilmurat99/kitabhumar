@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import com.squareup.picasso.Picasso
 import com.uyghar.kitabhumar.databinding.FragmentDetailBinding
 import com.uyghar.kitabhumar.models.Post
+import com.uyghar.kitabhumar.models.Slider
+import com.uyghar.kitabhumar.ui.home.SlideAdapter
 
 
 class DetailFragment : Fragment() {
@@ -42,6 +44,20 @@ class DetailFragment : Fragment() {
         binding.postDate.setText(post?.updated_at)
         binding.userName.setText(post?.user?.nickname + " " + post?.post_category?.title)
         binding.postText.setText(post?.content)
+        //val image_count = post?.post_images?.size ?: 0
+        //if (image_count > 0) {
+        //Array<Slider>(image_count) { Slider(null, null, null, null, null, null) }
+            var sliders = ArrayList<Slider>()
+            //var n = 0
+            post?.post_images?.forEach { postImage ->
+                val slider = Slider(null, null, postImage.images, null, null, null)
+                sliders.add(slider)
+                //sliders.set(n, slider)
+                //n += 1
+            }
+
+            binding.postImage.adapter = SlideAdapter(sliders.toTypedArray(), childFragmentManager, lifecycle)
+        //}
 
     }
 
