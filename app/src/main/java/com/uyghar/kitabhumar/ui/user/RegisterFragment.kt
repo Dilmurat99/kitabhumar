@@ -1,5 +1,8 @@
 package com.uyghar.kitabhumar.ui.user
 
+import android.Manifest
+import android.app.Activity
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,17 +16,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import android.widget.Toast
-
-import androidx.annotation.NonNull
-
-import com.google.android.gms.tasks.OnCompleteListener
 import com.uyghar.kitabhumar.R
-import androidx.core.app.ActivityCompat.startActivityForResult
-
 import android.content.Intent
-import android.content.DialogInterface
-import androidx.appcompat.app.AlertDialog
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.os.Build
+import android.provider.MediaStore
+import android.view.Window
+import android.widget.ImageView
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.checkSelfPermission
+import java.security.Permission
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -41,7 +44,13 @@ class RegisterFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private val CAMERA_REQUEST = 1888
+    private val ALBUM_REQUEST = 2888
+    private val MY_CAMERA_PERMISSION_CODE = 100
+    private val MY_ALBUM_PERMISSION_CODE = 200
 
+    private lateinit var buttonImage: ImageButton
+    private lateinit var dialog: Dialog
     var from = 0 //This must be declared as global !
 
     private lateinit var auth: FirebaseAuth
@@ -68,9 +77,30 @@ class RegisterFragment : Fragment() {
         val buttonReg = root.findViewById<Button>(R.id.buttonReg)
         val editEmail = root.findViewById<EditText>(R.id.editEmail)
         val editPassword = root.findViewById<EditText>(R.id.editPassword)
-        val buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
+        buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
         buttonImage.setOnClickListener {
-            val choice = arrayOf("Choose from Gallery", "Capture a photo")
+            dialog = Dialog(requireContext())
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setCancelable(true)
+            dialog.setContentView(R.layout.album_camera)
+            val buttonCamera = dialog.findViewById<Button>(R.id.buttonCamera)
+            val buttonAlbum = dialog.findViewById<Button>(R.id.buttonAlbum)
+            val buttonClose = root.findViewById<Button>(R.id.buttonClose)
+
+            val listener = View.OnClickListener { button ->
+                when(button.id) {
+                    R.id.buttonCamera -> openCamera()
+                    R.id.buttonAlbum -> openAlbum()
+                    R.id.buttonClose -> buttonImage.setImageResource(R.drawable.ic_baseline_image_24)
+                }
+
+            }
+            buttonCamera.setOnClickListener(listener)
+            buttonAlbum.setOnClickListener(listener)
+            buttonClose.setOnClickListener(listener)
+            dialog.show()
+
+            /*val choice = arrayOf("Choose from Gallery", "Capture a photo")
 
             val alert: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(activity)
             alert.setTitle("Upload Photo")
@@ -94,7 +124,8 @@ class RegisterFragment : Fragment() {
                     // Your Code
                 }
             })
-            alert.show()
+            alert.show()*/
+
 
         }
         buttonReg.setOnClickListener {
@@ -138,23 +169,52 @@ class RegisterFragment : Fragment() {
         return root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RegisterFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RegisterFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    fun openCamera() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(requireContext(),Manifest.permission.CAMERA) != PermissionChecker.PERMISSION_GRANTED) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.CAMERA),
+                    MY_CAMERA_PERMISSION_CODE
+                )
+            } else {
+                val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(cameraIntent, CAMERA_REQUEST)
             }
+        }
+    }
+
+    fun openAlbum() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PermissionChecker.PERMISSION_GRANTED) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    MY_ALBUM_PERMISSION_CODE
+                )
+            } else {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.type = "image/*"
+                startActivityForResult(intent, ALBUM_REQUEST)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        dialog.dismiss()
+        if (resultCode == Activity.RESULT_OK) {
+
+            when(requestCode) {
+                CAMERA_REQUEST -> {
+                    val bitmap = data?.extras?.get("data") as? Bitmap
+                    buttonImage.setImageBitmap(bitmap)
+                }
+                ALBUM_REQUEST -> {
+                    buttonImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    buttonImage.setImageURI(data?.data)
+                }
+
+            }
+        }
+
     }
 }
