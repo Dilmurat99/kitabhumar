@@ -3,6 +3,7 @@ package com.uyghar.kitabhumar.ui.user
 import android.Manifest
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -20,13 +21,25 @@ import com.uyghar.kitabhumar.R
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.media.Image
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.view.Window
 import android.widget.ImageView
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.checkSelfPermission
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import java.security.Permission
+import android.graphics.drawable.BitmapDrawable
+
+
+
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -48,6 +61,7 @@ class RegisterFragment : Fragment() {
     private val ALBUM_REQUEST = 2888
     private val MY_CAMERA_PERMISSION_CODE = 100
     private val MY_ALBUM_PERMISSION_CODE = 200
+    private var image: Image? = null
 
     private lateinit var buttonImage: ImageButton
     private lateinit var dialog: Dialog
@@ -76,6 +90,10 @@ class RegisterFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_register, container, false)
         val buttonReg = root.findViewById<Button>(R.id.buttonReg)
         val editEmail = root.findViewById<EditText>(R.id.editEmail)
+        val editName = root.findViewById<EditText>(R.id.editName)
+        val editSurName = root.findViewById<EditText>(R.id.editSurname)
+        val editUserName = root.findViewById<EditText>(R.id.editUsername)
+
         val editPassword = root.findViewById<EditText>(R.id.editPassword)
         buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
         buttonImage.setOnClickListener {
@@ -129,7 +147,19 @@ class RegisterFragment : Fragment() {
 
         }
         buttonReg.setOnClickListener {
-            if (is_login) {
+            val email = editEmail.text.toString()
+            val name = editName.text.toString()
+            val surName = editSurName.text.toString()
+            val userName = editUserName.text.toString()
+            //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
+            val params = HashMap<String,String>()
+            params["email"] = email
+            params["name"] = name
+            params["nickname"] = userName
+            params["surname"] = surName
+            //val params = ["email":email,"name":name,"surname":surname,"username":userName]
+            postMultipart("http://172.104.143.75:8004/api/members/",params,ArrayList())
+            /*if (is_login) {
                 auth.signInWithEmailAndPassword(editEmail.text.toString(),
                     editPassword.text.toString())
                     .addOnCompleteListener {
@@ -164,7 +194,7 @@ class RegisterFragment : Fragment() {
 
                         }
                     }
-            }
+            }*/
         }
         return root
     }
@@ -181,6 +211,62 @@ class RegisterFragment : Fragment() {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST)
             }
         }
+    }
+
+    fun postMultipart(url: String, params: HashMap<String, String>, images: List<Uri>) {
+        var formBody = MultipartBody.Builder()
+        formBody.setType(MultipartBody.FORM)
+        for ((k, v) in params) {
+            formBody.addFormDataPart(k, v.toString())
+        }
+
+        images.forEach {
+            val imgPath = getRealPathFromURI(requireContext(), it) ?: return
+            val file = File(imgPath)
+            var typeStr = "images/jpeg"
+            var fileName = "file.jpg"
+            if (file.name.substringAfterLast('.',"").capitalize().equals("PNG")) {
+                typeStr = "images/png"
+                fileName = "file.png"
+            }
+            val fileRequestBody = file.asRequestBody(typeStr.toMediaTypeOrNull())
+            formBody.addFormDataPart("images[]", fileName, fileRequestBody)
+        }
+
+        val requestBody = formBody.build()
+
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    Log.i("Submit", "OK")
+
+                } else {
+                    Log.i("Submit", "Failed")
+
+                }
+            }
+
+        }
+
+    fun getRealPathFromURI(context: Context, contentURI: Uri): String? {
+        val result: String?
+        val cursor =
+            context.contentResolver.query(contentURI, null, null, null, null)
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.path
+        } else {
+            cursor.moveToFirst()
+            val idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+            result = cursor.getString(idx)
+            cursor.close()
+        }
+        return result
     }
 
     fun openAlbum() {
@@ -207,6 +293,7 @@ class RegisterFragment : Fragment() {
                 CAMERA_REQUEST -> {
                     val bitmap = data?.extras?.get("data") as? Bitmap
                     buttonImage.setImageBitmap(bitmap)
+
                 }
                 ALBUM_REQUEST -> {
                     buttonImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
