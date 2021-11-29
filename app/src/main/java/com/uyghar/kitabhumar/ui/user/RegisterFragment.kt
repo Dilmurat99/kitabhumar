@@ -61,7 +61,12 @@ class RegisterFragment : Fragment() {
     private val ALBUM_REQUEST = 2888
     private val MY_CAMERA_PERMISSION_CODE = 100
     private val MY_ALBUM_PERMISSION_CODE = 200
-    private var image: Image? = null
+    private var uri: Uri? = null
+
+    private var name: String? = null
+    private var surname: String? = null
+    private var nickname: String? = null
+    private var email: String? = null
 
     private lateinit var buttonImage: ImageButton
     private lateinit var dialog: Dialog
@@ -147,57 +152,26 @@ class RegisterFragment : Fragment() {
 
         }
         buttonReg.setOnClickListener {
-            val email = editEmail.text.toString()
-            val name = editName.text.toString()
-            val surName = editSurName.text.toString()
-            val userName = editUserName.text.toString()
+            email = editEmail.text.toString()
+            name = editName.text.toString()
+            surname = editSurName.text.toString()
+            nickname = editUserName.text.toString()
             //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
             val params = HashMap<String,String>()
-            params["email"] = email
-            params["name"] = name
-            params["nickname"] = userName
-            params["surname"] = surName
+            params["email"] = email ?: ""
+            params["name"] = name ?: ""
+            params["nickname"] = nickname ?: ""
+            params["surname"] = surname ?: ""
+            var images = ArrayList<Uri>()
+            uri?.let {
+                images.add(it)
+            }
             //val params = ["email":email,"name":name,"surname":surname,"username":userName]
             Thread() {
-                postMultipart("http://172.104.143.75:8004/api/members/",params,ArrayList())
+                postMultipart("http://172.104.143.75:8004/api/members/",params,images)
             }.start()
 
-            /*if (is_login) {
-                auth.signInWithEmailAndPassword(editEmail.text.toString(),
-                    editPassword.text.toString())
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            Log.i("regUser", "Login")
-                        }
-                        else {
-                            Log.i("regUser", it.exception?.localizedMessage.toString())
-                        }
-                    }
-                    /*.addOnFailureListener {
-                        //Log.i("regUser", it.toString())
 
-                        Log.i("regUser", it.getLocalizedMessage())
-                    }*/
-            } else {
-                auth.createUserWithEmailAndPassword(
-                    editEmail.text.toString(),
-                    editPassword.text.toString()
-                )
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val user = auth.currentUser
-                            user?.sendEmailVerification()
-                                ?.addOnCompleteListener {
-                                    Log.i("regUser", "Email was sent")
-                                }
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.i("regUser", task.exception?.localizedMessage ?: "")
-
-                        }
-                    }
-            }*/
         }
         return root
     }
@@ -220,7 +194,7 @@ class RegisterFragment : Fragment() {
         var formBody = MultipartBody.Builder()
         formBody.setType(MultipartBody.FORM)
         for ((k, v) in params) {
-            formBody.addFormDataPart(k, v.toString())
+            formBody.addFormDataPart(k, v)
         }
 
         images.forEach {
@@ -248,6 +222,8 @@ class RegisterFragment : Fragment() {
         client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     Log.i("Submit", "OK")
+                    val userHelper = UserHelper(requireContext())
+
 
                 } else {
                     Log.i("Submit", "Failed")
@@ -291,9 +267,10 @@ class RegisterFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         dialog.dismiss()
         if (resultCode == Activity.RESULT_OK) {
-
+            uri = data?.data
             when(requestCode) {
                 CAMERA_REQUEST -> {
+
                     val bitmap = data?.extras?.get("data") as? Bitmap
                     buttonImage.setImageBitmap(bitmap)
 
