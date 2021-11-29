@@ -158,7 +158,10 @@ class RegisterFragment : Fragment() {
             params["nickname"] = userName
             params["surname"] = surName
             //val params = ["email":email,"name":name,"surname":surname,"username":userName]
-            postMultipart("http://172.104.143.75:8004/api/members/",params,ArrayList())
+            Thread() {
+                postMultipart("http://172.104.143.75:8004/api/members/",params,ArrayList())
+            }.start()
+
             /*if (is_login) {
                 auth.signInWithEmailAndPassword(editEmail.text.toString(),
                     editPassword.text.toString())
