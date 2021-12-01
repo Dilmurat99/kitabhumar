@@ -51,6 +51,11 @@ class UserHelper(context: Context): SQLiteOpenHelper(context,"user.db",null,1) {
         return tizim
     }
 
+    fun clearDB() {
+        val db = this.writableDatabase
+        db.delete(TABLE_NAME,null,null)
+    }
+
     override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
 
     }

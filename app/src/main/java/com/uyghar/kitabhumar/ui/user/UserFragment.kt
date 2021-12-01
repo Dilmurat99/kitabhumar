@@ -1,11 +1,15 @@
 package com.uyghar.kitabhumar.ui.user
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.uyghar.kitabhumar.R
 
@@ -38,6 +42,30 @@ class UserFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_user, container, false)
+
+        val userHelper = UserHelper(requireContext())
+        val members = userHelper.members()
+        val profile = root.findViewById<ConstraintLayout>(R.id.profile)
+        profile.isVisible = members.size > 0
+
+        val buttonExit = root.findViewById<Button>(R.id.button_exit)
+        buttonExit.setOnClickListener {
+            AlertDialog.Builder(context)
+                .setTitle("")
+                .setMessage("راستىنلا چېكىنەمسىز؟")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("ھەئە", object: DialogInterface.OnClickListener {
+                    override fun onClick(p0: DialogInterface?, p1: Int) {
+                        userHelper.clearDB()
+                        profile.isVisible = false
+                    }
+
+                })
+                .setNegativeButton("ياق", null)
+                .show()
+
+        }
+
         val buttonReg = root.findViewById<Button>(R.id.button_register)
         buttonReg.setOnClickListener {
             val bundle = Bundle()

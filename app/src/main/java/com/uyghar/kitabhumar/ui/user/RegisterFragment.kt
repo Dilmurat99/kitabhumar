@@ -66,8 +66,14 @@ class RegisterFragment : Fragment() {
     private var nickname: String? = null
     private var email: String? = null
 
+    private lateinit var editEmail: EditText
+    private lateinit var editName: EditText
+    private lateinit var editSurName: EditText
+    private lateinit var editUserName: EditText
+
     private lateinit var buttonImage: ImageButton
     private lateinit var dialog: Dialog
+    private lateinit var waitDialog: Dialog
     var from = 0 //This must be declared as global !
 
     private lateinit var auth: FirebaseAuth
@@ -92,10 +98,15 @@ class RegisterFragment : Fragment() {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_register, container, false)
         val buttonReg = root.findViewById<Button>(R.id.buttonReg)
-        val editEmail = root.findViewById<EditText>(R.id.editEmail)
-        val editName = root.findViewById<EditText>(R.id.editName)
-        val editSurName = root.findViewById<EditText>(R.id.editSurname)
-        val editUserName = root.findViewById<EditText>(R.id.editUsername)
+        editEmail = root.findViewById<EditText>(R.id.editEmail)
+        editName = root.findViewById<EditText>(R.id.editName)
+        editSurName = root.findViewById<EditText>(R.id.editSurname)
+        editUserName = root.findViewById<EditText>(R.id.editUsername)
+
+        waitDialog = Dialog(requireContext())
+        waitDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        waitDialog.setCancelable(true)
+        waitDialog.setContentView(R.layout.wait_dialog)
 
         val editPassword = root.findViewById<EditText>(R.id.editPassword)
         buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
@@ -150,32 +161,28 @@ class RegisterFragment : Fragment() {
 
         }
         buttonReg.setOnClickListener {
+
+
+            //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
+            val params = HashMap<String,String>()
             email = editEmail.text.toString()
             name = editName.text.toString()
             surname = editSurName.text.toString()
             nickname = editUserName.text.toString()
-            val member = User(1,name,surname,nickname,email,"")
-            val userHelper = UserHelper(requireContext())
-            userHelper.newMember(member)
-            val members = userHelper.members()
-            Log.i("members:", members.size.toString())
-            /*
-            //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
-            val params = HashMap<String,String>()
             params["email"] = email ?: ""
             params["name"] = name ?: ""
             params["nickname"] = nickname ?: ""
             params["surname"] = surname ?: ""
+
             var images = ArrayList<Uri>()
             uri?.let {
                 images.add(it)
             }
             //val params = ["email":email,"name":name,"surname":surname,"username":userName]
+            waitDialog.show()
             Thread() {
                 postMultipart("http://172.104.143.75:8004/api/members/",params,images)
-            }.start()*/
-
-
+            }.start()
         }
         return root
     }
@@ -192,6 +199,15 @@ class RegisterFragment : Fragment() {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST)
             }
         }
+    }
+
+    fun saveToDB() {
+
+        val member = User(1,name,surname,nickname,email,"")
+        val userHelper = UserHelper(requireContext())
+        userHelper.newMember(member)
+        val members = userHelper.members()
+        Log.i("members:", members.size.toString())
     }
 
     fun postMultipart(url: String, params: HashMap<String, String>, images: List<Uri>) {
@@ -211,7 +227,7 @@ class RegisterFragment : Fragment() {
                 fileName = "file.png"
             }
             val fileRequestBody = file.asRequestBody(typeStr.toMediaTypeOrNull())
-            formBody.addFormDataPart("images[]", fileName, fileRequestBody)
+            formBody.addFormDataPart("image", fileName, fileRequestBody)
         }
 
         val requestBody = formBody.build()
@@ -226,11 +242,13 @@ class RegisterFragment : Fragment() {
         client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     Log.i("Submit", "OK")
-                    val userHelper = UserHelper(requireContext())
-
-
+                    saveToDB()
+                    activity?.runOnUiThread {
+                        waitDialog.dismiss()
+                    }
                 } else {
-                    Log.i("Submit", "Failed")
+
+                    Log.i("Submit", response.message)
 
                 }
             }
