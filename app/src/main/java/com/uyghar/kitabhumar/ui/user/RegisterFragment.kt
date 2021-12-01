@@ -37,9 +37,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.security.Permission
 import android.graphics.drawable.BitmapDrawable
-
-
-
+import com.uyghar.kitabhumar.models.User
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -156,6 +154,12 @@ class RegisterFragment : Fragment() {
             name = editName.text.toString()
             surname = editSurName.text.toString()
             nickname = editUserName.text.toString()
+            val member = User(1,name,surname,nickname,email,"")
+            val userHelper = UserHelper(requireContext())
+            userHelper.newMember(member)
+            val members = userHelper.members()
+            Log.i("members:", members.size.toString())
+            /*
             //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
             val params = HashMap<String,String>()
             params["email"] = email ?: ""
@@ -169,7 +173,7 @@ class RegisterFragment : Fragment() {
             //val params = ["email":email,"name":name,"surname":surname,"username":userName]
             Thread() {
                 postMultipart("http://172.104.143.75:8004/api/members/",params,images)
-            }.start()
+            }.start()*/
 
 
         }
