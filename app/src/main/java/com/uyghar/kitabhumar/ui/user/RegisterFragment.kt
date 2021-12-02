@@ -37,6 +37,9 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.security.Permission
 import android.graphics.drawable.BitmapDrawable
+import androidx.navigation.fragment.findNavController
+import com.google.gson.GsonBuilder
+import com.uyghar.kitabhumar.models.Slider
 import com.uyghar.kitabhumar.models.User
 
 
@@ -201,11 +204,9 @@ class RegisterFragment : Fragment() {
         }
     }
 
-    fun saveToDB() {
-
-        val member = User(1,name,surname,nickname,email,"")
+    fun saveToDB(user: User) {
         val userHelper = UserHelper(requireContext())
-        userHelper.newMember(member)
+        userHelper.newMember(user)
         val members = userHelper.members()
         Log.i("members:", members.size.toString())
     }
@@ -242,9 +243,14 @@ class RegisterFragment : Fragment() {
         client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     Log.i("Submit", "OK")
-                    saveToDB()
+                    val gson = GsonBuilder().create()
+                    val json_str = response.body?.string()
+                    val user = gson.fromJson(json_str, User::class.java)
+                    saveToDB(user)
                     activity?.runOnUiThread {
                         waitDialog.dismiss()
+                        findNavController().popBackStack()
+                        findNavController().navigate(R.id.userFragment)
                     }
                 } else {
 

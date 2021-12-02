@@ -51,8 +51,10 @@
             app:cardBackgroundColor="#aaa"
             >
             <ImageView
+                android:id="@+id/profile_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:scaleType="fitXY"
                 android:src="@drawable/aptor"
                 />
         </androidx.cardview.widget.CardView>

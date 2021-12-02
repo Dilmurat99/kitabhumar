@@ -13,9 +13,11 @@ class UserHelper(context: Context): SQLiteOpenHelper(context,"user.db",null,1) {
     val FIELD_SURNAME = "surname"
     var FIELD_EMAIL = "email"
     var FIELD_NICKNAME = "nickname"
+    var FIELD_IMAGE = "image"
+
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val sql_str = "CREATE TABLE IF NOT EXISTS $TABLE_NAME($FIELD_ID INTEGER, $FIELD_NAME TEXT, $FIELD_SURNAME TEXT, $FIELD_NICKNAME TEXT, $FIELD_EMAIL TEXT)"
+        val sql_str = "CREATE TABLE IF NOT EXISTS $TABLE_NAME($FIELD_ID INTEGER, $FIELD_NAME TEXT, $FIELD_SURNAME TEXT, $FIELD_NICKNAME TEXT, $FIELD_EMAIL TEXT, $FIELD_IMAGE TEXT)"
         db?.execSQL(sql_str)
     }
 
@@ -28,6 +30,8 @@ class UserHelper(context: Context): SQLiteOpenHelper(context,"user.db",null,1) {
         contentValues.put(FIELD_SURNAME, member.surname)
         contentValues.put(FIELD_NICKNAME, member.nickname)
         contentValues.put(FIELD_EMAIL, member.email)
+        contentValues.put(FIELD_IMAGE, member.image)
+
         db.insert(TABLE_NAME, null, contentValues)
         db.close()
         //db.execSQL(sql_str)
@@ -44,7 +48,8 @@ class UserHelper(context: Context): SQLiteOpenHelper(context,"user.db",null,1) {
             val surname = cursor.getString(2)
             val nickname = cursor.getString(3)
             val email = cursor.getString(4)
-            val member = User(id, name, surname, nickname, email, "")
+            val image = cursor.getString(5)
+            val member = User(id, name, surname, nickname, email, image)
             tizim.add(member)
         }
         db.close()
