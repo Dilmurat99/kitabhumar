@@ -45,17 +45,19 @@ class UserFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_user, container, false)
-
-        val userHelper = UserHelper(requireContext())
-        val user = userHelper.members().first()
         val profile = root.findViewById<ConstraintLayout>(R.id.profile)
-        profile.isVisible = user != null
-        if (profile.isVisible) {
-            val text_user_name: TextView = root.findViewById(R.id.text_username)
-            val profile_image: ImageView = root.findViewById(R.id.profile_image)
-            text_user_name.setText(user.nickname ?: "")
-            if (user.image?.isBlank() == false)
-                Picasso.get().load("http://172.104.143.75:8004"+user.image).into(profile_image)
+        val userHelper = UserHelper(requireContext())
+        if (userHelper.members().size > 0) {
+            val user = userHelper.members().first()
+            profile.isVisible = user != null
+            if (profile.isVisible) {
+                val text_user_name: TextView = root.findViewById(R.id.text_username)
+                val profile_image: ImageView = root.findViewById(R.id.profile_image)
+                text_user_name.setText(user.nickname ?: "")
+                if (user.image?.isBlank() == false)
+                    Picasso.get().load("http://172.104.143.75:8004" + user.image)
+                        .into(profile_image)
+            }
         }
 
         val buttonExit = root.findViewById<Button>(R.id.button_exit)
