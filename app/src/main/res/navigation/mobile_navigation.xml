@@ -36,4 +36,13 @@
         android:name="com.uyghar.kitabhumar.ui.user.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" />
+    <fragment
+        android:id="@+id/verifyFragment"
+        android:name="com.uyghar.kitabhumar.ui.user.VerifyFragment"
+        android:label="fragment_verify"
+        tools:layout="@layout/fragment_verify" />
+    <fragment
+        android:id="@+id/emailFragment"
+        android:name="com.uyghar.kitabhumar.ui.user.EmailFragment"
+        android:label="EmailFragment" />
 </navigation>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.user.VerifyFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/text_info"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:textColor="#000"
+        android:layout_margin="50dp"
+        android:layout_height="wrap_content"
+        android:text="خەت ساندۇقىڭىزنى تەكشۈرۈپ، سىزگە كەلگەن ئۇلانمىنى بېسىپ، ئېمەيل ئادرېسىڭىزنى دەلىللىگەندىن كېيىن، تۆۋەنكى كونۇپكىنى بېسىڭ."
+        />
+    <Button
+        android:id="@+id/buttonVerify"
+        app:layout_constraintTop_toBottomOf="@id/text_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="كىرىڭ"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

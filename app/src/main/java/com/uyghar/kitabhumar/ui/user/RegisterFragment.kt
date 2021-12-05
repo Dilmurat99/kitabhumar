@@ -73,14 +73,12 @@ class RegisterFragment : Fragment() {
     private lateinit var editName: EditText
     private lateinit var editSurName: EditText
     private lateinit var editUserName: EditText
+    private lateinit var editPassword: EditText
 
     private lateinit var buttonImage: ImageButton
     private lateinit var dialog: Dialog
     private lateinit var waitDialog: Dialog
     var from = 0 //This must be declared as global !
-
-    private lateinit var auth: FirebaseAuth
-    var is_login = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,10 +86,8 @@ class RegisterFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-        arguments?.let {
-            is_login = it.getBoolean("is_login")
-        }
-        auth = Firebase.auth
+
+
     }
 
     override fun onCreateView(
@@ -105,12 +101,8 @@ class RegisterFragment : Fragment() {
         editName = root.findViewById<EditText>(R.id.editName)
         editSurName = root.findViewById<EditText>(R.id.editSurname)
         editUserName = root.findViewById<EditText>(R.id.editUsername)
-
-        waitDialog = Dialog(requireContext())
-        waitDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        waitDialog.setCancelable(true)
-        waitDialog.setContentView(R.layout.wait_dialog)
-
+        editPassword = root.findViewById(R.id.editPassword)
+        createWaitDialog()
         val editPassword = root.findViewById<EditText>(R.id.editPassword)
         buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
         buttonImage.setOnClickListener {
@@ -164,31 +156,20 @@ class RegisterFragment : Fragment() {
 
         }
         buttonReg.setOnClickListener {
-
-
-            //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
-            val params = HashMap<String,String>()
-            email = editEmail.text.toString()
-            name = editName.text.toString()
-            surname = editSurName.text.toString()
-            nickname = editUserName.text.toString()
-            params["email"] = email ?: ""
-            params["name"] = name ?: ""
-            params["nickname"] = nickname ?: ""
-            params["surname"] = surname ?: ""
-
-            var images = ArrayList<Uri>()
-            uri?.let {
-                images.add(it)
-            }
-            //val params = ["email":email,"name":name,"surname":surname,"username":userName]
             waitDialog.show()
-            Thread() {
-                postMultipart("http://172.104.143.75:8004/api/members/",params,images)
-            }.start()
+            //firebaseLogin()
         }
         return root
     }
+
+    fun createWaitDialog() {
+        waitDialog = Dialog(requireContext())
+        waitDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        waitDialog.setCancelable(true)
+        waitDialog.setContentView(R.layout.wait_dialog)
+    }
+
+
 
     fun openCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -202,6 +183,29 @@ class RegisterFragment : Fragment() {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST)
             }
         }
+    }
+
+    fun saveToRemote() {
+        //val bitmap = (buttonImage.drawable as BitmapDrawable).bitmap
+        val params = HashMap<String,String>()
+        email = editEmail.text.toString()
+        name = editName.text.toString()
+        surname = editSurName.text.toString()
+        nickname = editUserName.text.toString()
+        params["email"] = email ?: ""
+        params["name"] = name ?: ""
+        params["nickname"] = nickname ?: ""
+        params["surname"] = surname ?: ""
+
+        var images = ArrayList<Uri>()
+        uri?.let {
+            images.add(it)
+        }
+        //val params = ["email":email,"name":name,"surname":surname,"username":userName]
+        waitDialog.show()
+        Thread() {
+            postMultipart("http://172.104.143.75:8004/api/members/",params,images)
+        }.start()
     }
 
     fun saveToDB(user: User) {

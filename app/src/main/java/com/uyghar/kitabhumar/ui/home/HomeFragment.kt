@@ -20,6 +20,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.uyghar.kitabhumar.R
 import com.uyghar.kitabhumar.databinding.FragmentHomeBinding
 import com.google.android.material.shape.CornerFamily
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import com.uyghar.kitabhumar.models.Author
@@ -35,6 +37,18 @@ import java.net.URL
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import android.app.Activity
+import android.view.inputmethod.InputMethodManager
+
+
+val auth = Firebase.auth
+
+
+fun hideSoftKeyboard(activity: Activity) {
+    val inputMethodManager: InputMethodManager =
+        activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(activity.currentFocus!!.windowToken, 0)
+}
 
 
 class HomeFragment : Fragment() {

@@ -58,7 +58,8 @@ class UserFragment : Fragment() {
                     Picasso.get().load("http://172.104.143.75:8004" + user.image)
                         .into(profile_image)
             }
-        }
+        } else
+            profile.isVisible = false
 
         val buttonExit = root.findViewById<Button>(R.id.button_exit)
         buttonExit.setOnClickListener {
@@ -82,13 +83,13 @@ class UserFragment : Fragment() {
         buttonReg.setOnClickListener {
             val bundle = Bundle()
             bundle.putBoolean("is_login",false)
-            findNavController().navigate(R.id.registerFragment,bundle)
+            findNavController().navigate(R.id.emailFragment,bundle)
         }
         val buttonLogin = root.findViewById<Button>(R.id.button_login)
         buttonLogin.setOnClickListener {
             val bundle = Bundle()
             bundle.putBoolean("is_login",true)
-            findNavController().navigate(R.id.registerFragment,bundle)
+            findNavController().navigate(R.id.emailFragment,bundle)
         }
         return root
     }
