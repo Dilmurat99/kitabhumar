@@ -84,25 +84,25 @@ class EmailFragment : Fragment() {
         val password = editPassword.text.toString()
         auth.signInWithEmailAndPassword(email ?: "",
             password ?: "")
-            .addOnCompleteListener {
+            .addOnCompleteListener { task ->
                 waitDialog.dismiss()
                 hideSoftKeyboard(requireActivity())
-                val user = auth.currentUser
-                user?.let {
-                    if (it.isEmailVerified) {
-                        findNavController().popBackStack()
-                        findNavController().navigate(R.id.userFragment)
-                    } else {
-                        Snackbar.make(root, "ئېمەيل ئادرېسىڭىزنى تېخى دەلىللىمىدىڭىز", Snackbar.LENGTH_LONG).show()
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    user?.let {
+                        if (it.isEmailVerified) {
+                            findNavController().popBackStack()
+                            findNavController().navigate(R.id.userFragment)
+                        } else {
+                            Snackbar.make(root, "ئېمەيل ئادرېسىڭىزنى تېخى دەلىللىمىدىڭىز", Snackbar.LENGTH_LONG).show()
+                        }
                     }
-                }
-                if (it.isSuccessful) {
-                    Log.i("regUser", "Login")
+                } else {
+                    val localizedMessage = task.exception!!.localizedMessage
+//                  Snackbar.make(root, localizedMessage,Snackbar.LENGTH_LONG).show()
                 }
             }
-            .addOnFailureListener {
-                Log.i("regUser", it.toString())
-            }
+
     }
 
     fun firebaseRegister() {
