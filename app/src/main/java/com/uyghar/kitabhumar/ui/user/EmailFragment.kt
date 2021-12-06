@@ -90,6 +90,7 @@ class EmailFragment : Fragment() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     user?.let {
+                        val id = it.uid
                         if (it.isEmailVerified) {
                             findNavController().popBackStack()
                             findNavController().navigate(R.id.userFragment)
