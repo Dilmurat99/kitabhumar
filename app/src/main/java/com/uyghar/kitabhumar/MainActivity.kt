@@ -12,26 +12,36 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.findNavController
+import com.google.gson.GsonBuilder
 import com.uyghar.kitabhumar.databinding.ActivityMainBinding
+import com.uyghar.kitabhumar.models.Book
+import okhttp3.*
+import java.io.IOException
+import java.net.URL
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    var book_array: Array<Book>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.appBarMain.toolbar)
-
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        getBooks()
+        binding.appBarMain.fab.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putParcelableArray("book_array",book_array)
+            findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.newPostFragment,bundle)
         }
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -42,6 +52,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
             ), drawerLayout
         )
+
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
@@ -56,6 +68,28 @@ class MainActivity : AppCompatActivity() {
         val config = this.resources.configuration
         config.setLocale(locale)
         return createConfigurationContext(config)
+    }
+
+    fun getBooks() {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(URL("http://172.104.143.75:8004/api/books/"))
+            .build()
+        client.newCall(request).enqueue(
+            object: Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val json_str = response.body?.string()
+                    val gson = GsonBuilder().create()
+                    book_array = gson.fromJson(json_str, Array<Book>::class.java)
+                }
+
+            }
+        )
     }
 
 

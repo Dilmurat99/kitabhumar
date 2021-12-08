@@ -95,7 +95,10 @@ class VerifyFragment : Fragment() {
                     val user = auth.currentUser
                     user?.let {
                         if (it.isEmailVerified) {
-                            findNavController().navigate(R.id.registerFragment)
+                            val bundle = Bundle()
+                            bundle.putString("email",email)
+                            bundle.putString("uid",it.uid)
+                            findNavController().navigate(R.id.registerFragment, bundle)
                         } else {
                             Snackbar.make(root, "ئېمەيل ئادرېسىڭىزنى تېخى دەلىللىمىدىڭىز", Snackbar.LENGTH_LONG).show()
                         }

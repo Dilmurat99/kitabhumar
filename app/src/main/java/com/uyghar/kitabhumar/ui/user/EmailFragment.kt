@@ -20,7 +20,16 @@ import com.uyghar.kitabhumar.R
 import com.uyghar.kitabhumar.ui.home.auth
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.gson.GsonBuilder
+import com.uyghar.kitabhumar.models.Book
+import com.uyghar.kitabhumar.models.User
 import com.uyghar.kitabhumar.ui.home.hideSoftKeyboard
+import okhttp3.*
+import okhttp3.internal.wait
+import java.io.IOException
+import java.net.URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -79,28 +88,64 @@ class EmailFragment : Fragment() {
         return root
     }
 
+    fun getUser(uid: String) {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(URL("http://172.104.143.75:8004/api/members/?uid=$uid"))
+            .build()
+        client.newCall(request).enqueue(
+            object: Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Snackbar.make(root,e.toString(),Snackbar.LENGTH_LONG).show()
+
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val json_str = response.body?.string()
+                    val gson = GsonBuilder().create()
+                    val user_array = gson.fromJson(json_str, Array<User>::class.java)
+                    if (user_array.size > 0) {
+                        saveToDB(user_array.first())
+                        activity?.runOnUiThread {
+                            waitDialog.dismiss()
+                            findNavController().popBackStack(R.id.nav_home, true)
+                            findNavController().navigate(R.id.userFragment)
+                        }
+                    } else
+                        Snackbar.make(root,"خاتالىق كۆرۈلدى",Snackbar.LENGTH_LONG).show()
+
+
+                }
+
+            }
+        )
+    }
+
+    fun saveToDB(user: User) {
+        val userHelper = UserHelper(requireContext())
+        userHelper.newMember(user)
+    }
+
     fun firebaseLogin() {
         val email = editEmail.text.toString()
         val password = editPassword.text.toString()
         auth.signInWithEmailAndPassword(email ?: "",
             password ?: "")
             .addOnCompleteListener { task ->
-                waitDialog.dismiss()
                 hideSoftKeyboard(requireActivity())
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     user?.let {
-                        val id = it.uid
                         if (it.isEmailVerified) {
-                            findNavController().popBackStack()
-                            findNavController().navigate(R.id.userFragment)
+                            val id = it.uid
+                            getUser(id)
                         } else {
                             Snackbar.make(root, "ئېمەيل ئادرېسىڭىزنى تېخى دەلىللىمىدىڭىز", Snackbar.LENGTH_LONG).show()
                         }
                     }
                 } else {
                     val localizedMessage = task.exception!!.localizedMessage
-//                  Snackbar.make(root, localizedMessage,Snackbar.LENGTH_LONG).show()
+                  Snackbar.make(root, localizedMessage,Snackbar.LENGTH_LONG).show()
                 }
             }
 

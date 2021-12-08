@@ -54,9 +54,14 @@ class UserFragment : Fragment() {
                 val text_user_name: TextView = root.findViewById(R.id.text_username)
                 val profile_image: ImageView = root.findViewById(R.id.profile_image)
                 text_user_name.setText(user.nickname ?: "")
-                if (user.image?.isBlank() == false)
-                    Picasso.get().load("http://172.104.143.75:8004" + user.image)
+                var image_url = user.image
+                if (image_url?.isBlank() == false) {
+                    //val image_url = if (user.image?.contains("http")!!) user.image else "http://172.104.143.75:8004" + user.image
+                    if (!image_url.contains("http"))
+                        image_url = "http://172.104.143.75:8004" + image_url
+                    Picasso.get().load(image_url)
                         .into(profile_image)
+                }
             }
         } else
             profile.isVisible = false

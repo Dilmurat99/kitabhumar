@@ -68,12 +68,12 @@ class RegisterFragment : Fragment() {
     private var surname: String? = null
     private var nickname: String? = null
     private var email: String? = null
+    private var uid: String? = null
 
     private lateinit var editEmail: EditText
     private lateinit var editName: EditText
     private lateinit var editSurName: EditText
     private lateinit var editUserName: EditText
-    private lateinit var editPassword: EditText
 
     private lateinit var buttonImage: ImageButton
     private lateinit var dialog: Dialog
@@ -83,8 +83,8 @@ class RegisterFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            email = it.getString("email")
+            uid = it.getString("uid")
         }
 
 
@@ -98,12 +98,11 @@ class RegisterFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_register, container, false)
         val buttonReg = root.findViewById<Button>(R.id.buttonReg)
         editEmail = root.findViewById<EditText>(R.id.editEmail)
+        editEmail.setText(email)
         editName = root.findViewById<EditText>(R.id.editName)
         editSurName = root.findViewById<EditText>(R.id.editSurname)
         editUserName = root.findViewById<EditText>(R.id.editUsername)
-        editPassword = root.findViewById(R.id.editPassword)
         createWaitDialog()
-        val editPassword = root.findViewById<EditText>(R.id.editPassword)
         buttonImage = root.findViewById<ImageButton>(R.id.buttonImage)
         buttonImage.setOnClickListener {
             dialog = Dialog(requireContext())
@@ -157,7 +156,7 @@ class RegisterFragment : Fragment() {
         }
         buttonReg.setOnClickListener {
             waitDialog.show()
-            //firebaseLogin()
+            saveToRemote()
         }
         return root
     }
@@ -196,6 +195,7 @@ class RegisterFragment : Fragment() {
         params["name"] = name ?: ""
         params["nickname"] = nickname ?: ""
         params["surname"] = surname ?: ""
+        params["uid"] = uid ?: ""
 
         var images = ArrayList<Uri>()
         uri?.let {
@@ -246,14 +246,13 @@ class RegisterFragment : Fragment() {
 
         client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    Log.i("Submit", "OK")
                     val gson = GsonBuilder().create()
                     val json_str = response.body?.string()
                     val user = gson.fromJson(json_str, User::class.java)
                     saveToDB(user)
                     activity?.runOnUiThread {
                         waitDialog.dismiss()
-                        findNavController().popBackStack()
+                        findNavController().popBackStack(R.id.nav_home,true)
                         findNavController().navigate(R.id.userFragment)
                     }
                 } else {

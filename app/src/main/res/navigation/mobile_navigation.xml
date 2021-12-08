@@ -45,4 +45,9 @@
         android:id="@+id/emailFragment"
         android:name="com.uyghar.kitabhumar.ui.user.EmailFragment"
         android:label="EmailFragment" />
+    <fragment
+        android:id="@+id/newPostFragment"
+        android:name="com.uyghar.kitabhumar.ui.post.NewPostFragment"
+        android:label="fragment_new_post"
+        tools:layout="@layout/fragment_new_post" />
 </navigation>

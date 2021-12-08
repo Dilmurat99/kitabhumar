@@ -17,21 +17,11 @@
         android:layout_marginRight="50dp"
         android:layout_marginTop="50dp"
         android:hint="ئېخەت ئادرېسىڭىز"
+        android:enabled="false"
          />
     <EditText
-        android:id="@+id/editPassword"
-        app:layout_constraintTop_toBottomOf="@id/editEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="5dp"
-        android:hint="مەخپى نومۇرىڭىز"
-        />
-    <EditText
         android:id="@+id/editName"
-        app:layout_constraintTop_toBottomOf="@id/editPassword"
+        app:layout_constraintTop_toBottomOf="@id/editEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"

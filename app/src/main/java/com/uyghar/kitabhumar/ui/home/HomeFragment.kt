@@ -39,6 +39,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import android.app.Activity
 import android.view.inputmethod.InputMethodManager
+import androidx.navigation.findNavController
+import com.uyghar.kitabhumar.MainActivity
 
 
 val auth = Firebase.auth
@@ -56,7 +58,6 @@ class HomeFragment : Fragment() {
     private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentHomeBinding? = null
     private var slider_array: Array<Slider>? = null
-    private var book_array: Array<Book>? = null
     private var author_array: Array<Author>? = null
     private var post_array: Array<Post>? = null
     private var no = 0;
@@ -76,13 +77,13 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         binding  = _binding!!
+
         val root: View = binding.root
         GlobalScope.launch {
-            val isBooksReady = async { getBooks() }
             val isAuthorsReady = async { getAuthors() }
             val isSliderReady = async { getSlider() }
             val isPostsReady = async { getPosts() }
-            if (isBooksReady.await() && isAuthorsReady.await() && isSliderReady.await() && isPostsReady.await()) {
+            if (isAuthorsReady.await() && isSliderReady.await() && isPostsReady.await()) {
                 activity?.runOnUiThread {
                     binding.progressView.visibility = View.INVISIBLE
                     binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -93,6 +94,8 @@ class HomeFragment : Fragment() {
         getAuthors()
         getSlider()*/
         }
+
+        //this::file.isInitialized
 
 
         return root
@@ -147,31 +150,7 @@ class HomeFragment : Fragment() {
         )
     }
 
-    suspend fun getBooks(): Boolean = suspendCoroutine { res ->
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .url(URL("http://172.104.143.75:8004/api/books/"))
-            .build()
-        client.newCall(request).enqueue(
-            object: Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    e.printStackTrace()
-                    res.resume(false)
-                }
 
-                override fun onResponse(call: Call, response: Response) {
-                    val json_str = response.body?.string()
-                    val gson = GsonBuilder().create()
-                    book_array = gson.fromJson(json_str, Array<Book>::class.java)
-                    activity?.runOnUiThread {
-                        showBooks()
-                    }
-                    res.resume(true)
-                }
-
-            }
-        )
-    }
 
     suspend fun getAuthors(): Boolean = suspendCoroutine { res ->
         val client = OkHttpClient()
@@ -191,6 +170,7 @@ class HomeFragment : Fragment() {
                     author_array = gson.fromJson(json_str, Array<Author>::class.java)
                     activity?.runOnUiThread {
                         showAuthor()
+                        showBooks()
                     }
                     res.resume(true)
                 }
@@ -223,7 +203,7 @@ class HomeFragment : Fragment() {
     }
 
     fun showBooks() {
-        book_array?.forEach {
+        (activity as MainActivity).book_array?.forEach {
             val imageView = ImageView(requireContext())
             Picasso.get().load(it.image).into(imageView)
             /*imageView.tag = i
