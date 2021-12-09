@@ -3,6 +3,7 @@ package com.uyghar.kitabhumar
 import android.content.Context
 import android.os.Bundle
 import android.view.Menu
+import android.widget.ProgressBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -12,6 +13,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.google.gson.GsonBuilder
 import com.uyghar.kitabhumar.databinding.ActivityMainBinding
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
+        wait(true)
         getBooks()
         binding.appBarMain.fab.setOnClickListener {
             val bundle = Bundle()
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        wait(true)
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -79,6 +83,10 @@ class MainActivity : AppCompatActivity() {
             object: Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     e.printStackTrace()
+                    runOnUiThread {
+                        wait(false)
+
+                    }
 
                 }
 
@@ -86,10 +94,21 @@ class MainActivity : AppCompatActivity() {
                     val json_str = response.body?.string()
                     val gson = GsonBuilder().create()
                     book_array = gson.fromJson(json_str, Array<Book>::class.java)
+                    runOnUiThread {
+                        wait(false)
+
+                    }
+
                 }
 
             }
         )
+
+    }
+
+
+    fun wait(isOn: Boolean) {
+        binding.appBarMain.progressBar.isVisible = isOn
     }
 
 

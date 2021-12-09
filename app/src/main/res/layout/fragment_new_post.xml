@@ -6,43 +6,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.post.NewPostFragment">
     <Spinner
-        android:id="@+id/spinner_category"
-        android:layout_marginTop="30dp"
+        android:id="@+id/spinner_book"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        />
+    <Spinner
+        android:id="@+id/spinner_category"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/spinner_book"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
 
         />
-    <Spinner
-        android:id="@+id/spinner_book"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/spinner_category"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        />
-    <EditText
-        android:id="@+id/edit_title"
-        app:layout_constraintTop_toBottomOf="@id/spinner_book"
-        android:hint="ماۋزۇ"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        />
+
+
     <EditText
         android:id="@+id/edit_content"
         android:hint="مەزمۇن"
-        app:layout_constraintTop_toBottomOf="@id/edit_title"
+        app:layout_constraintTop_toBottomOf="@id/spinner_category"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        />
+    <Button
+        android:id="@+id/button_submit"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="يوللا"
+        app:layout_constraintTop_toBottomOf="@id/edit_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
