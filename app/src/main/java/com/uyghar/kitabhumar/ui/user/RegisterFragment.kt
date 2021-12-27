@@ -232,7 +232,7 @@ class RegisterFragment : Fragment() {
                 fileName = "file.png"
             }
             val fileRequestBody = file.asRequestBody(typeStr.toMediaTypeOrNull())
-            formBody.addFormDataPart("image", fileName, fileRequestBody)
+            formBody.addFormDataPart("post_images[]", fileName, fileRequestBody)
         }
 
         val requestBody = formBody.build()
@@ -289,6 +289,7 @@ class RegisterFragment : Fragment() {
             } else {
                 val intent = Intent(Intent.ACTION_PICK)
                 intent.type = "image/*"
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                 startActivityForResult(intent, ALBUM_REQUEST)
             }
         }

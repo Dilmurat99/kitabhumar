@@ -86,9 +86,10 @@ class UserFragment : Fragment() {
 
         val buttonReg = root.findViewById<Button>(R.id.button_register)
         buttonReg.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putBoolean("is_login",false)
-            findNavController().navigate(R.id.emailFragment,bundle)
+            //val bundle = Bundle()
+            //bundle.putBoolean("is_login",false)
+            //findNavController().navigate(R.id.emailFragment,bundle)
+            findNavController().navigate(R.id.registerFragment)
         }
         val buttonLogin = root.findViewById<Button>(R.id.button_login)
         buttonLogin.setOnClickListener {

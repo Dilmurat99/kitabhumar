@@ -77,6 +77,46 @@
             android:layout_margin="10dp"
             android:lines="2"
             />
+        <Button
+            android:id="@+id/button_like"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/book_text"
+            android:background="@drawable/like_bg"
+            android:text="10"
+            />
+        <TextView
+            app:layout_constraintStart_toStartOf="@id/button_like"
+            app:layout_constraintEnd_toEndOf="@id/button_like"
+            app:layout_constraintTop_toBottomOf="@id/button_like"
+            android:id="@+id/text_like_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10"
+            />
+        <Button
+            android:id="@+id/button_comment"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toEndOf="@id/button_like"
+            app:layout_constraintTop_toBottomOf="@id/book_text"
+            android:background="@drawable/ic_baseline_comment_24"
+            android:text="10"
+            />
+        <TextView
+            app:layout_constraintStart_toStartOf="@id/button_comment"
+            app:layout_constraintEnd_toEndOf="@id/button_comment"
+            app:layout_constraintTop_toBottomOf="@id/button_like"
+            android:id="@+id/text_comment_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4"
+            />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

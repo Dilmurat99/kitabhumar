@@ -84,7 +84,19 @@ class EmailFragment : Fragment() {
         }
         editEmail = root.findViewById<EditText>(R.id.editEmail)
         editPassword = root.findViewById<EditText>(R.id.editPassword)
-
+        val buttonReset: Button = root.findViewById(R.id.buttonReset)
+        buttonReset.setOnClickListener {
+            val email = editEmail.text.toString()
+            if (!email.isNullOrBlank()) {
+                auth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener {
+                        if (it.isSuccessful)
+                            Snackbar.make(root,"OK",Snackbar.LENGTH_LONG).show()
+                        else
+                            it.exception?.printStackTrace()
+                    }
+            }
+        }
         return root
     }
 

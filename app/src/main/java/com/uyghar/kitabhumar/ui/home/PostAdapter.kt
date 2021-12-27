@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import com.uyghar.kitabhumar.MainActivity
 import com.uyghar.kitabhumar.R
@@ -34,6 +35,10 @@ class PostAdapter(val context: Context, val fragment: Fragment, val post_array: 
             val bundle = Bundle()
             bundle.putParcelable("post", post)
             navController.navigate(R.id.detailFragment, bundle)
+        }
+        holder.postItemBinding.buttonLike.setOnClickListener {
+            holder.postItemBinding.buttonLike.isSelected = !holder.postItemBinding.buttonLike.isSelected
+            Snackbar.make(holder.itemView,post.id.toString(),Snackbar.LENGTH_LONG).show()
         }
 
     }

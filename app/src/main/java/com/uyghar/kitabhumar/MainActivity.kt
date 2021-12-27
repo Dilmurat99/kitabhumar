@@ -2,6 +2,7 @@ package com.uyghar.kitabhumar
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.widget.ProgressBar
 import com.google.android.material.snackbar.Snackbar
@@ -18,7 +19,13 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.GsonBuilder
 import com.uyghar.kitabhumar.databinding.ActivityMainBinding
 import com.uyghar.kitabhumar.models.Book
+import com.uyghar.kitabhumar.models.DataModel
+import com.uyghar.kitabhumar.models.FBMessage
+import com.uyghar.kitabhumar.models.NotificationModel
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.internal.http2.Header
 import java.io.IOException
 import java.net.URL
 import java.util.*
@@ -40,9 +47,10 @@ class MainActivity : AppCompatActivity() {
         wait(true)
         getBooks()
         binding.appBarMain.fab.setOnClickListener {
-            val bundle = Bundle()
+            sendNotification("Alo","Firebase test", 2828)
+            /*val bundle = Bundle()
             bundle.putParcelableArray("book_array",book_array)
-            findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.newPostFragment,bundle)
+            findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.newPostFragment,bundle)*/
         }
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -60,6 +68,35 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         wait(true)
+    }
+
+    fun sendNotification(title: String, body: String, id: Int) {
+        val notificationModel = NotificationModel(title,body,"high",true)
+        val dataModel = DataModel(id)
+        val fbMessage = FBMessage("/topics/kitabhumar",notificationModel, dataModel)
+        val gson = GsonBuilder().create()
+        val json_param = gson.toJson(fbMessage)
+
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = json_param.toRequestBody(mediaType)
+
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(URL("https://fcm.googleapis.com/fcm/send"))
+            .addHeader("Authorization","key=AAAAxn7XiGY:APA91bHwUBlefzJVst21mjFze33c85eCXKLuq_V44jFWsxRNtVZqDcRMM54XkISjbhV5HRS7TgzKDa2A4PhpXLnJ2vYw1nZGASHheyi4FwN9h6TO9uSpUZrDghn9Vhsa73WrDm_mfCh5")
+            .post(body)
+            .build()
+        client.newCall(request).enqueue(object: Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val res = response.body?.string()
+                Log.i("response", res ?: "")
+            }
+
+        })
     }
 
     override fun attachBaseContext(newBase: Context?) {
